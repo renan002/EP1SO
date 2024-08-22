@@ -15,7 +15,7 @@ public class Main {
 
         while (!processosProntos.isEmpty()) {
             Processo processo = processosProntos.poll();
-            System.out.println(processo);
+            System.out.println("Carregando "+processo);
         }
 
     }
@@ -81,13 +81,6 @@ class Processo implements Comparable<Processo>{
 
     @Override
     public String toString() {
-        final String[] i = {""};
-        instrucoes.forEach(instrucao -> i[0] += instrucao + "\n");
-        return "Processo{" +
-                "prioridade=" + prioridade +
-                ", estado='" + estado + '\'' +
-                ", nome='" + nome + '\'' +
-                ", \ninstrucoes=\n" + i[0] +
-                '}';
+        return nome;
     }
 }

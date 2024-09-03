@@ -85,8 +85,8 @@ public class BCP implements Comparable<BCP>{
             this.prioridade = prioridade;
             this.nome = nome;
             this.instrucoes = instrucoes;
-            this.X = "";
-            this.Y = "";
+            this.X = "0";
+            this.Y = "0";
         }
     }
 

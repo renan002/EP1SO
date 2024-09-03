@@ -26,29 +26,17 @@ public class FilaProcessos {
         }
     }
 
-    private void redistribuirCreditos() {
-        for (BCP processo : this.processosProntos) {
-            processo.creditos = processo.getPrioridade();
-        }
-    }
-
-    private Boolean temProcessosProntos() {
-        if (!this.processosProntos.isEmpty()){
-            for (BCP processo : this.processosProntos) {
-                if (processo.creditos > 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    public Boolean temProcessosProntos() {
+        return !this.processosProntos.isEmpty();
     }
 
     public BCP iniciarNovoProcesso() {
         if (this.temProcessosProntos()) {
             BCP processo = this.processosProntos.poll();
             processo.setEstado(BCP.Estados.EXECUTANDO);
-            processo.creditos -= 1;
+
             if (processo != processoExecutando) {
+                processo.creditos -= 1;
                 processoExecutando = processo;
                 System.out.println("Executando "+processoExecutando);
             }
@@ -64,15 +52,17 @@ public class FilaProcessos {
     }
 
     public void diminuirBloqueados() {
-        this.processosBloqueados.forEach((p) -> {
+        List<ProcessosBloqueados> bloqueados = this.processosBloqueados;
+        for (int i = 0; i < bloqueados.size(); i++) {
+            ProcessosBloqueados p = bloqueados.get(i);
             p.tempoRestante -= 1;
 
-            if (p.tempoRestante==0) {
+            if (p.tempoRestante == 0) {
                 p.processo.setEstado(BCP.Estados.PRONTO);
                 this.processosProntos.add(p.processo);
                 this.processosBloqueados.remove(p);
             }
-        });
+        }
 
 
     }

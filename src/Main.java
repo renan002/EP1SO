@@ -18,14 +18,20 @@ public class Main {
 
         quantum = lerQuantum();
 
-        executarProcessos();
-        executarProcessos();
+        while (TabelaProcessos.temProcessosExecutando()) {
+            executarProcessos();
+        }
 
     }
 
 
     private static void executarProcessos() {
         BCP processoExecutando = filaProcessos.iniciarNovoProcesso();
+
+        if (processoExecutando.creditos < 0) {
+            System.out.println("puta que me pariu");
+        }
+        filaProcessos.diminuirBloqueados();
 
         if (processoExecutando != null){
 
@@ -43,12 +49,13 @@ public class Main {
                     processoExecutando.setY(instrucaoSplit[1]);
                     processoExecutando.incrementarPC();
                 } else if (instrucao.equals("E/S")) {
+                    System.out.println("E/S iniciada em " + processoExecutando);
                     System.out.println("Interrompendo " + processoExecutando + " após " + (i + 1) + " instruções");
                     processoExecutando.incrementarPC();
                     filaProcessos.bloquearProcesso(processoExecutando);
                     break;
                 } else if (instrucao.equals("SAIDA")) {
-                    System.out.println("Interrompendo " + processoExecutando + " após " + i + 1 + " instruções");
+                    System.out.println("Interrompendo " + processoExecutando + " após " + (i + 1) + " instruções");
                     processoExecutando.processoFinalizado();
                     break;
                 }
@@ -60,9 +67,10 @@ public class Main {
                 processoExecutando.setEstado(BCP.Estados.PRONTO);
                 filaProcessos.inserirProcesso(processoExecutando);
             }
+        }else {
+            System.out.println("Nenhum processo executando");
         }
 
-        filaProcessos.diminuirBloqueados();
     }
 
 

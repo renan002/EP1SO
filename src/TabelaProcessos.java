@@ -6,18 +6,14 @@ public class TabelaProcessos {
 
     private static TabelaProcessos tabelaProcessos;
 
-    HashMap<String, BCP> processosRodando;
+    HashMap<String, BCP> processosEmMemoria;
 
     private TabelaProcessos(List<BCP> processos) {
-        this.processosRodando = new HashMap<>();
+        this.processosEmMemoria = new HashMap<>();
 
         for (BCP processo : processos) {
-            this.processosRodando.put(processo.getPID(), processo);
+            this.processosEmMemoria.put(processo.getPID(), processo);
         }
-    }
-
-    public BCP getProcesso(String PID) {
-        return this.processosRodando.get(PID);
     }
 
     public static TabelaProcessos iniciar(List<BCP> processos) {
@@ -29,6 +25,26 @@ public class TabelaProcessos {
     }
 
     public static void removerProcesso(String PID) {
-        tabelaProcessos.processosRodando.remove(PID);
+        tabelaProcessos.processosEmMemoria.remove(PID);
     }
+
+    public static Boolean temProcessosExecutando() {
+        boolean redistribuirCreditos = true;
+        for (BCP processo : tabelaProcessos.processosEmMemoria.values()) {
+            if (processo.creditos > 0) {
+                redistribuirCreditos = false;
+                break;
+            }
+        }
+        if (redistribuirCreditos)
+            tabelaProcessos.redistribuirCreditos();
+        return !tabelaProcessos.processosEmMemoria.isEmpty();
+    }
+
+    private void redistribuirCreditos() {
+        for (BCP processo : tabelaProcessos.processosEmMemoria.values()) {
+            processo.creditos = processo.getPrioridade();
+        }
+    }
+
 }

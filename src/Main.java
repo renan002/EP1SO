@@ -28,9 +28,6 @@ public class Main {
     private static void executarProcessos() {
         BCP processoExecutando = filaProcessos.iniciarNovoProcesso();
 
-        if (processoExecutando.creditos < 0) {
-            System.out.println("puta que me pariu");
-        }
         filaProcessos.diminuirBloqueados();
 
         if (processoExecutando != null){

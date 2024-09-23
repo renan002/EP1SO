@@ -1,17 +1,14 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class FilaProcessos {
 
     private static BCP processoExecutando;
 
-    Queue<BCP> processosProntos;
+    PriorityQueue<BCP> processosProntos;
     List<ProcessosBloqueados> processosBloqueados;
 
     public FilaProcessos() {
-        this.processosProntos = new LinkedList<>();
+        this.processosProntos = new PriorityQueue<>();
         this.processosBloqueados = new ArrayList<>();
     }
 

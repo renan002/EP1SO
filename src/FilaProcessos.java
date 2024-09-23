@@ -30,6 +30,7 @@ public class FilaProcessos {
 
     public BCP iniciarNovoProcesso() {
         if (this.temProcessosProntos()) {
+            //TODO implementar round robin quando todos os processos prontos tem 0 créditos
             BCP processo = this.processosProntos.poll();
             processo.setEstado(BCP.Estados.EXECUTANDO);
 

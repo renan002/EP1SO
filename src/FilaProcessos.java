@@ -4,12 +4,21 @@ public class FilaProcessos {
 
     private static BCP processoExecutando;
 
-    PriorityQueue<BCP> processosProntos;
+    private final Queue<BCP> processosProntosPriority;
+    private final Queue<BCP> processosProntosQueue;
     List<ProcessosBloqueados> processosBloqueados;
 
     public FilaProcessos() {
-        this.processosProntos = new PriorityQueue<>();
+        this.processosProntosPriority = new PriorityQueue<>();
+        this.processosProntosQueue = new LinkedList<>();
         this.processosBloqueados = new ArrayList<>();
+    }
+
+    private void addProcesso(BCP processo) {
+        if (!this.processosProntosPriority.contains(processo))
+            this.processosProntosPriority.add(processo);
+        if (!this.processosProntosQueue.contains(processo))
+            this.processosProntosQueue.add(processo);
     }
 
     public void inserirProcessos(List<BCP> processos) {
@@ -18,29 +27,40 @@ public class FilaProcessos {
         }
     }
 
+    private BCP pollProcesso() {
+        BCP processo = this.processosProntosPriority.peek();
+        if (processo.creditos > 0) {
+            return this.processosProntosPriority.poll();
+
+        } else {
+            return this.processosProntosQueue.poll();
+        }
+
+    }
+
     public void inserirProcesso(BCP processo) {
         if (processo.getEstado().equals(BCP.Estados.PRONTO)) {
-            this.processosProntos.add(processo);
+            this.addProcesso(processo);
         }
     }
 
     public Boolean temProcessosProntos() {
-        return !this.processosProntos.isEmpty();
+        return !this.processosProntosPriority.isEmpty();
     }
 
     public BCP iniciarNovoProcesso() {
         if (this.temProcessosProntos()) {
             //TODO implementar round robin quando todos os processos prontos tem 0 créditos
-            BCP processo = this.processosProntos.poll();
+            BCP processo = pollProcesso();
             processo.setEstado(BCP.Estados.EXECUTANDO);
+                if (processo != processoExecutando) {
+                    //processo.creditos -= 1;
+                    processoExecutando = processo;
+                    String Mensagem = ("Executando "+processoExecutando +"\n");
+                    Main.escreveNoArquivo(Mensagem);
+                }
+                return processo;
 
-            if (processo != processoExecutando) {
-                processo.creditos -= 1;
-                processoExecutando = processo;
-                String Mensagem = ("Executando "+processoExecutando +"\n");
-                Main.escreveNoArquivo(Mensagem);
-            }
-            return processo;
         }
 
         return null;
@@ -59,7 +79,7 @@ public class FilaProcessos {
 
             if (p.tempoRestante == 0) {
                 p.processo.setEstado(BCP.Estados.PRONTO);
-                this.processosProntos.add(p.processo);
+                addProcesso(p.processo);
                 this.processosBloqueados.remove(p);
             }
         }

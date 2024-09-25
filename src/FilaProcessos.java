@@ -30,10 +30,13 @@ public class FilaProcessos {
     private BCP pollProcesso() {
         BCP processo = this.processosProntosPriority.peek();
         if (processo.creditos > 0) {
-            return this.processosProntosPriority.poll();
-
+            processo = this.processosProntosPriority.poll();
+            this.processosProntosQueue.remove(processo);
+            return processo;
         } else {
-            return this.processosProntosQueue.poll();
+            processo = this.processosProntosQueue.poll();
+            this.processosProntosPriority.remove(processo);
+            return processo;
         }
 
     }
@@ -50,14 +53,13 @@ public class FilaProcessos {
 
     public BCP iniciarNovoProcesso() {
         if (this.temProcessosProntos()) {
-            //TODO implementar round robin quando todos os processos prontos tem 0 créditos
             BCP processo = pollProcesso();
             processo.setEstado(BCP.Estados.EXECUTANDO);
                 if (processo != processoExecutando) {
-                    //processo.creditos -= 1;
+                    processo.creditos -= 1;
                     processoExecutando = processo;
-                    String Mensagem = ("Executando "+processoExecutando +"\n");
-                    Main.escreveNoArquivo(Mensagem);
+                    String mensagem = ("Executando "+processoExecutando +"\n");
+                    LogFile.getInstance().appendMessage(mensagem);
                 }
                 return processo;
 

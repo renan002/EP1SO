@@ -60,7 +60,8 @@ public class BCP implements Comparable<BCP>{
 
     public void processoFinalizado() {
         this.setEstado(Estados.FINALIZADO);
-        Main.escreveNoArquivo(this.getPID() + " terminado. X=" + this.getX() + ". Y=" + this.getY() + "\n");
+        String mensagem = String.format("%s terminado. X=%s. Y=%s%n", this.getPID(), this.getX(), this.getY());
+        LogFile.getInstance().appendMessage(mensagem);
         TabelaProcessos.removerProcesso(this.getPID());
     }
 

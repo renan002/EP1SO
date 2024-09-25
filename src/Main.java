@@ -1,4 +1,3 @@
-import javax.print.attribute.standard.Media;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,19 +10,13 @@ public class Main {
     public static FilaProcessos filaProcessos;
     public static TabelaProcessos tabelaProcessos;
 
-    static String caminho = "arquivo.txt";
-    static FileWriter escritor;
-    static int quantum = 0;
+    public static int quantum = 0;
     static Double MediaTP = 0.0;
     static int QuantP = 0;
 
 
     public static void main(String[] args) {
         try {
-            escritor = new FileWriter(caminho, true);
-            escritor.write("Iniciando a execução...\n");
-            escritor.flush();
-
             List<BCP> processos = lerProcessos();
             filaProcessos = new FilaProcessos();
             filaProcessos.inserirProcessos(processos);
@@ -34,20 +27,14 @@ public class Main {
             while (TabelaProcessos.temProcessosExecutando()) {
                 executarProcessos();
             }
-            escreveNoArquivo("Quantum: "+ quantum + "\n");
-            escreveNoArquivo("MediaDeTrocaDeProcessos: " + (MediaTP/10) + "\n");
-            escreveNoArquivo("QuantidadeDeProcessos: " + QuantP);
-        } catch (IOException e) {
-            System.err.println("Erro ao inicializar o escritor: " + e.getMessage());
+            LogFile.getInstance().appendMessage(String.format("Quantum: %d%n",quantum));
+            LogFile.getInstance().appendMessage(String.format("MediaDeTrocaDeProcessos: %.2f%n", (MediaTP/10)));
+            LogFile.getInstance().appendMessage(String.format("QuantidadeDeProcessos: %d%n", QuantP));
+
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
-            // Fechar o escritor se foi inicializado
-            try {
-                if (escritor != null) {
-                    escritor.close();
-                }
-            } catch (IOException e) {
-                System.err.println("Erro ao fechar o escritor: " + e.getMessage());
-            }
+            LogFile.getInstance().save();
         }
     }
 
@@ -74,16 +61,14 @@ public class Main {
                     MediaTP++;
                     String mensagem = "E/S iniciada em " + processoExecutando + "\n" +
                             "Interrompendo " + processoExecutando + " após " + (i + 1) + " instruções\n";
-                    System.out.print(mensagem);
-                    escreveNoArquivo(mensagem);
+                    LogFile.getInstance().appendMessage(mensagem);
                     processoExecutando.incrementarPC();
                     filaProcessos.bloquearProcesso(processoExecutando);
                     break;
                 } else if (instrucao.equals("SAIDA")) {
                     MediaTP++;
                     String mensagem = "Interrompendo " + processoExecutando + " após " + (i + 1) + " instruções\n";
-                    System.out.print(mensagem);
-                    escreveNoArquivo(mensagem);
+                    LogFile.getInstance().appendMessage(mensagem);
                     processoExecutando.processoFinalizado();
                     break;
                 }
@@ -92,15 +77,15 @@ public class Main {
             if (processoExecutando.getEstado().equals(BCP.Estados.EXECUTANDO)) {
                 MediaTP++;
                 String mensagem = "Interrompendo " + processoExecutando + " após " + quantum + " instruções\n";
-                System.out.print(mensagem);
-                escreveNoArquivo(mensagem);
+
+                LogFile.getInstance().appendMessage(mensagem);
                 processoExecutando.setEstado(BCP.Estados.PRONTO);
                 filaProcessos.inserirProcesso(processoExecutando);
             }
         } else {
             String mensagem = "Nenhum processo executando\n";
-            System.out.print(mensagem);
-            escreveNoArquivo(mensagem);
+
+            LogFile.getInstance().appendMessage(mensagem);
         }
     }
 
@@ -130,9 +115,9 @@ public class Main {
         processos.sort(BCP::compareTo);
 
         processos.forEach(p -> {
-            String Mensagem ="Carregando " + p + "\n";
-            System.out.print(Mensagem);
-            escreveNoArquivo(Mensagem);
+            String mensagem ="Carregando " + p + "\n";
+
+            LogFile.getInstance().appendMessage(mensagem);
         });
 
         return processos;
@@ -149,15 +134,5 @@ public class Main {
         return -1;
     }
 
-    public static void escreveNoArquivo(String texto) {
-        try {
-            if (escritor != null) {
-                escritor.write(texto);
-                escritor.flush();
-            }
-        } catch (IOException e) {
-            System.err.println("Erro ao escrever no arquivo: " + e.getMessage());
-        }
-    }
 }
 

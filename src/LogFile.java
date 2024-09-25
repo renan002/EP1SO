@@ -29,7 +29,7 @@ public class LogFile {
             e.printStackTrace();
         }
     }
-
+    //Funcao que verifica a existencia do arquivo (se nao existir, cria um novo)
     public static LogFile getInstance() {
         if (logFile == null) {
             logFile = new LogFile();
@@ -37,11 +37,12 @@ public class LogFile {
         return logFile;
     }
 
+    //Funcao para adicionar a mensagem no arquivo
     public void appendMessage(String message) {
         System.out.print(message);
         logFile.sb.append(message);
     }
-
+    //Função para salvar e fechar o arquivo
     public void save() {
         try {
             logFile.escritor.write(sb.toString());

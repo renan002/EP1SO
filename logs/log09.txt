@@ -118,5 +118,5 @@ Executando TESTE-1
 Interrompendo TESTE-1 após 1 instruções
 TESTE-1 terminado. X=2. Y=10
 Quantum: 9
-MediaDeTrocaDeProcessos: 3.70
-QuantidadeDeProcessos: 139
+MediaDeTrocaDeProcessos: 3,70
+MediaDeInstruçõesPorQuantum: 3,76

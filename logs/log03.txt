@@ -151,5 +151,5 @@ Nenhum processo executando
 Interrompendo TESTE-1 após 1 instruções
 TESTE-1 terminado. X=2. Y=10
 Quantum: 3
-MediaDeTrocaDeProcessos: 5.90
-QuantidadeDeProcessos: 139
+MediaDeTrocaDeProcessos: 5,90
+MediaDeInstruçõesPorQuantum: 2,36

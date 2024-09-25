@@ -16,8 +16,13 @@ public class Escalonador {
 
     //Valor do quantum a ser lido do arquivo
     public static int quantum = 0;
+    //Media de trocas de processos (Total de trocas/total de processos)
     static Double MediaTP = 0.0;
-    static int QuantP = 0;
+    //Media de instrucoes por quantum (Total de instruçoes/Quantidade de quantums realizados)
+    static Double MediaIQ = 0.0;
+    //Quantidade de quantums realizados
+    static int QuantQ = 0;
+
 
 
     public static void main(String[] args) {
@@ -35,9 +40,10 @@ public class Escalonador {
             while (TabelaProcessos.temProcessosExecutando()) {
                 executarProcessos();
             }
+            //Insercao das informacoes necessarias para o arquivo
             LogFile.getInstance().appendMessage(String.format("Quantum: %d%n",quantum));
             LogFile.getInstance().appendMessage(String.format("MediaDeTrocaDeProcessos: %.2f%n", (MediaTP/10)));
-            LogFile.getInstance().appendMessage(String.format("QuantidadeDeProcessos: %d%n", QuantP));
+            LogFile.getInstance().appendMessage(String.format("MediaDeInstruçõesPorQuantum: %.2f%n", MediaIQ/QuantQ));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,7 +64,6 @@ public class Escalonador {
 
         if (processoExecutando != null) {
             for (int i = 0; i < quantum; i++) {
-                QuantP++;
                 String instrucao = processoExecutando.proximaInstrucao();
                 if (instrucao.equals("COM")) {
                     processoExecutando.incrementarPC();
@@ -72,6 +77,8 @@ public class Escalonador {
                     processoExecutando.incrementarPC();
                 } else if (instrucao.equals("E/S")) {
                     MediaTP++;
+                    MediaIQ += (i+1);
+                    QuantQ++;
                     String mensagem = "E/S iniciada em " + processoExecutando + "\n" +
                             "Interrompendo " + processoExecutando + " após " + (i + 1) + " instruções\n";
                     LogFile.getInstance().appendMessage(mensagem);
@@ -80,6 +87,8 @@ public class Escalonador {
                     break;
                 } else if (instrucao.equals("SAIDA")) {
                     MediaTP++;
+                    MediaIQ += (i+1);
+                    QuantQ++;
                     String mensagem = "Interrompendo " + processoExecutando + " após " + (i + 1) + " instruções\n";
                     LogFile.getInstance().appendMessage(mensagem);
                     processoExecutando.processoFinalizado();
@@ -89,6 +98,8 @@ public class Escalonador {
 
             if (processoExecutando.getEstado().equals(BCP.Estados.EXECUTANDO)) {
                 MediaTP++;
+                MediaIQ += quantum;
+                QuantQ++;
                 String mensagem = "Interrompendo " + processoExecutando + " após " + quantum + " instruções\n";
 
                 LogFile.getInstance().appendMessage(mensagem);

@@ -7,6 +7,7 @@ import java.util.Scanner;
     Implementação do EP
     Código no Github para consulta
     https://github.com/renan002/EP1SO
+    @JDK 17
  */
 public class Escalonador {
 

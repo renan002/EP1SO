@@ -1,15 +1,19 @@
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Main {
+/*
+    Implementação do EP
+    Código no Github para consulta
+    https://github.com/renan002/EP1SO
+ */
+public class Escalonador {
 
     public static FilaProcessos filaProcessos;
     public static TabelaProcessos tabelaProcessos;
 
+    //Valor do quantum a ser lido do arquivo
     public static int quantum = 0;
     static Double MediaTP = 0.0;
     static int QuantP = 0;
@@ -18,12 +22,15 @@ public class Main {
     public static void main(String[] args) {
         try {
             List<BCP> processos = lerProcessos();
+            //Estrutura de dados para armazenar os processos
             filaProcessos = new FilaProcessos();
             filaProcessos.inserirProcessos(processos);
             tabelaProcessos = TabelaProcessos.iniciar(processos);
 
             quantum = lerQuantum();
 
+            //Loop que executa todos os processos, só para quando nao tivermos mais nenhum processo na memória
+            //ou seja, todos os processos foram executados
             while (TabelaProcessos.temProcessosExecutando()) {
                 executarProcessos();
             }
@@ -38,6 +45,11 @@ public class Main {
         }
     }
 
+    /*
+        Método principal da solução.
+        Este método é executado até que todos os processos sejam finalizados
+        Ele recebe um novo processo da fila e executa as instrucoes até que seu quantum acabe ou o processo seja bloqueado ou quando o processo se encerre
+     */
     private static void executarProcessos() {
         BCP processoExecutando = filaProcessos.iniciarNovoProcesso();
 
@@ -89,6 +101,10 @@ public class Main {
         }
     }
 
+    /*
+        Método para leitura dos processos contidos na pasta "programas"
+        Este método cria um objeto "BCP" para cada arquivo de processo e armazena sua prioridade
+     */
     private static List<BCP> lerProcessos() {
         ArrayList<BCP> processos = new ArrayList<>();
         try{
@@ -96,7 +112,7 @@ public class Main {
             File prioridades = new File("programas/prioridades.txt");
             Scanner scanner = new Scanner(prioridades);
             while (scanner.hasNextInt()) {
-                File processo = new File("programas/" + (i < 10 ? "0" + i : i) + ".txt");
+                File processo = new File(String.format("programas/%02d.txt",i));
                 Scanner scanner2 = new Scanner(processo);
                 String nome = scanner2.nextLine();
                 ArrayList<String> instrucoes = new ArrayList<>();
@@ -114,11 +130,7 @@ public class Main {
         }
         processos.sort(BCP::compareTo);
 
-        processos.forEach(p -> {
-            String mensagem ="Carregando " + p + "\n";
-
-            LogFile.getInstance().appendMessage(mensagem);
-        });
+        processos.forEach(p -> LogFile.getInstance().appendMessage(String.format("Carregando %s%n", p)));
 
         return processos;
     }

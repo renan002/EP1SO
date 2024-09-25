@@ -2,10 +2,18 @@ import java.util.*;
 
 public class FilaProcessos {
 
+    //O processo atualmente sendo executado
     private static BCP processoExecutando;
 
+    /*Estas duas Filas representam os processos prontos
+      As duas estruturas armazenam os mesmos dados espelhados
+      processosProntosPriority é uma PriorityQueue e armazena os processos prontos por ordem de créditos
+      processosProntosQueue é uma Queue e armazena os processos prontos em ordem de FIFO
+    */
     private final Queue<BCP> processosProntosPriority;
     private final Queue<BCP> processosProntosQueue;
+
+    //Estrutura que armazena os processos bloqueados
     List<ProcessosBloqueados> processosBloqueados;
 
     public FilaProcessos() {
@@ -27,6 +35,10 @@ public class FilaProcessos {
         }
     }
 
+    /*Este método busca um novo processo para ser executado priorizando a PriorityQueue
+        Caso o processo retornado pela priorityQueue esteja com os creditos zerados, significa que ainda temos processos a serem executados e/ou bloqueados
+        Então devemos buscar um novo processo por round robin, utiizando a processosProntosQueue
+    * */
     private BCP pollProcesso() {
         BCP processo = this.processosProntosPriority.peek();
         if (processo.creditos > 0) {
@@ -51,6 +63,7 @@ public class FilaProcessos {
         return !this.processosProntosPriority.isEmpty();
     }
 
+    //Método chamado pela classe do Escalonador que retorna o próximo processo pronto a ser executado, seguindo a ordem de prioridade
     public BCP iniciarNovoProcesso() {
         if (this.temProcessosProntos()) {
             BCP processo = pollProcesso();
@@ -68,11 +81,13 @@ public class FilaProcessos {
         return null;
     }
 
+    //Método chamado pela classe do Escalonador quando se é necessário bloquear um processo por E/S
     public void bloquearProcesso(BCP processo) {
         processo.setEstado(BCP.Estados.BLOQUEADO);
         this.processosBloqueados.add(new ProcessosBloqueados(processo, 2));
     }
 
+    //Método chamado pela classe do Escalonador quando se passa um quantum para remover um tempo de bloqueio dos processos bloqueados
     public void diminuirBloqueados() {
         List<ProcessosBloqueados> bloqueados = this.processosBloqueados;
         for (int i = 0; i < bloqueados.size(); i++) {
@@ -85,11 +100,9 @@ public class FilaProcessos {
                 this.processosBloqueados.remove(p);
             }
         }
-
-
     }
 
-
+    //Estrutura que representa um processo bloqueado em memória
     private static class ProcessosBloqueados {
         BCP processo;
         int tempoRestante;

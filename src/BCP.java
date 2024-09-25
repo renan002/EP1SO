@@ -1,5 +1,11 @@
 import java.util.List;
 
+/*
+    Classe que representa um processo na memória
+    Cada processo tem um nome, uma prioridade e uma lista de instruções
+    A instrucao sendo executada é o indice PC na lista de instrucoes
+
+ */
 public class BCP implements Comparable<BCP>{
     private Estados estado;
     private int PC;
@@ -16,10 +22,6 @@ public class BCP implements Comparable<BCP>{
 
     public String getPID() {
         return processo.nome;
-    }
-
-    public int getPC() {
-        return this.PC;
     }
 
     public Estados getEstado() {
@@ -65,6 +67,7 @@ public class BCP implements Comparable<BCP>{
         TabelaProcessos.removerProcesso(this.getPID());
     }
 
+    //Método utilizado para ordenar os processos utilizando a fila de prioridade do Java
     @Override
     public int compareTo(BCP o) {
         return Integer.compare(o.processo.prioridade, this.processo.prioridade);
